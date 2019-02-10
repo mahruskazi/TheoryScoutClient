@@ -74,5 +74,15 @@
 		<string>Roboto.ttf</string>
 		<string>rubicon-icon-font.ttf</string>
 	</array>
+<key>NSCameraUsageDescription</key>
+<string>Camera Accessed!!</string>
+
+<!-- Include this only if you are planning to use the camera roll -->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Photo Library Accessed!!</string>
+
+<!-- Include this only if you are planning to use the microphone for video recording -->
+<key>NSMicrophoneUsageDescription</key>
+<string>Microphone Accessed!!</string>
 </dict>
 </plist>

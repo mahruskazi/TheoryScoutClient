@@ -7,6 +7,8 @@ import WelcomeScreen from './src/components/WelcomeScreen'
 import Dashboard from './src/components/Dashboard'
 import ScoutScreen from './src/components/ScoutScreen'
 import MatchesScreen from './src/components/MatchesScreen'
+import QrcodeReader from './src/components/qr-code'
+import QRcodeGenerator from './src/components/qr-code-generator'
 
 export default class App extends React.Component {
   constructor() {
@@ -16,7 +18,7 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <AppContainer/>
+      <QRcodeGenerator />
     );
   }
 }
