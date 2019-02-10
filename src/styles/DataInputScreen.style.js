@@ -14,7 +14,7 @@ export default StyleSheet.create({
         flexDirection: 'column'
     },
     action_section: {
-        backgroundColor: '#c0c0c0',
+        backgroundColor: '#f2f2f2',
         flex: 15,
         justifyContent: 'center',
         alignItems: 'center'
@@ -118,4 +118,7 @@ export default StyleSheet.create({
     cargo_button_text: {
         color: 'white'
     },
+    timer: {
+        fontSize: 25
+    }
 });
