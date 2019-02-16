@@ -79,7 +79,6 @@ export default StyleSheet.create({
     cargo_ship: {
         flex: 1,
         flexDirection: 'row',
-        backgroundColor: 'black',
         borderTopLeftRadius: 20,
         borderBottomLeftRadius: 20,
     },

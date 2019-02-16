@@ -10,57 +10,36 @@ import Dialog, {
 import { ButtonGroup } from "react-native-elements";
 import constants from "../../constants/DataInputConstants";
 
-export default class CargoShipDialog extends Component {
+export default class AutoDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
       index: 0,
-      action: 0,
-      object_type: 0,
-      location: 0
+      action: null,
     };
 
     this.updateButtonIndex = this.updateButtonIndex.bind(this);
   }
 
-  reset() {
-    this.setState({index: 0})
-}
-
   updateButtonIndex(index) {
-    action = null;
-    if (index == 0) {
-      action =
-        this.props.object_type == constants.object_type.CARGO
-          ? constants.actions.SHIP_SCORE_CARGO
-          : constants.actions.SHIP_SCORE_HATCH;
-    } else {
-      action =
-        this.props.object_type == constants.object_type.CARGO
-          ? constants.actions.SHIP_MISSED_CARGO
-          : constants.actions.SHIP_MISSED_HATCH;
-    }
-    this.setState({ index, action });
+    this.setState({ index });
   }
 
   render() {
-    const buttons = ["SCORED", "MISSED"];
-    const { index, action } = this.state;
-    const { object_type, location } = this.props;
-    const name = object_type == constants.object_type.CARGO ? "CARGO" : "HATCH";
+    const buttons = ["NO", "YES"];
+    const { index } = this.state;
     return (
       <View>
         <Dialog
           visible={this.props.visible}
           onTouchOutside={() => {
             this.props.cancelPressed();
-            this.reset();
           }}
           actionsBordered
           dialogStyle={{ width: 500 }}
           dialogTitle={
             <DialogTitle
-              title={name + " Selected"}
+              title={"Starting TELE"}
               style={{
                 backgroundColor: "#F7F7F8"
               }}
@@ -75,7 +54,6 @@ export default class CargoShipDialog extends Component {
                 bordered
                 onPress={() => {
                   this.props.cancelPressed();
-                  this.reset();
                 }}
                 textStyle={{ fontSize: 15, color: "#008ae6" }}
                 key="button-1"
@@ -84,8 +62,7 @@ export default class CargoShipDialog extends Component {
                 text="OK"
                 bordered
                 onPress={() => {
-                  this.props.okPressed({ location, action });
-                  this.reset();
+                  this.props.okPressed(this.state);
                 }}
                 textStyle={{ fontSize: 15, color: "#008ae6" }}
                 key="button-2"
@@ -94,7 +71,7 @@ export default class CargoShipDialog extends Component {
           }
         >
           <DialogContent>
-            <Text>What did this team do?</Text>
+            <Text>Did this team get off the platform?</Text>
             <ButtonGroup
               onPress={this.updateButtonIndex}
               selectedIndex={index}

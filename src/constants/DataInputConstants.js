@@ -1,4 +1,9 @@
 export default {
+    period: {
+        NOT_STARTED: 0,
+        AUTO: 1,
+        TELE: 2
+    },
     object_type: {
         CARGO: 0,
         HATCH: 1
@@ -10,7 +15,9 @@ export default {
         RIGHT_FEEDER: 3,
         LEFT_FEEDER: 4,
         RIGHT_DEPOT: 5,
-        LEFT_DEPOT: 6
+        LEFT_DEPOT: 6,
+        RIGHT_FLOOR: 7,
+        LEFT_FLOOR: 8
     },
     actions: {
         SHIP_SCORE_HATCH: 0,
@@ -29,12 +36,10 @@ export default {
         ROCKET_MISSED_CARGO_HIGH: 13,
         ROCKET_MISSED_CARGO_MID: 14,
         ROCKET_MISSED_CARGO_LOW: 15,
-        FLOOR_PICKUP: 16,
-        FEEDER_PICKUP: 17,
-        DEPOT_PICKUP: 18,
-        DEFENDED: 19,
-        GOT_DEFENDED: 20,
-        DIED: 21,
-        DROPPED: 22
+        DROPPED: 16,
+        PICKUP: 17,
+        DEFENDED: 18,
+        GOT_DEFENDED: 19,
+        DIED: 20
     }
 }

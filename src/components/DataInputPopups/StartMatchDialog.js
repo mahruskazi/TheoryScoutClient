@@ -25,7 +25,7 @@ export default class StartMatchDialog extends Component {
 
   render() {
     const starting_position = ['LEFT', 'CENTER', 'RIGHT']
-    const starting_level = ['LEVEL 0', 'LEVEL 1', 'LEVEL 2']
+    const starting_level = ['LEVEL 1', 'LEVEL 2']
     const { position, level } = this.state
     return (
       <View>

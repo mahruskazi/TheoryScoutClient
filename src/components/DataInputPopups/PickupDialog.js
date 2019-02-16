@@ -10,57 +10,26 @@ import Dialog, {
 import { ButtonGroup } from "react-native-elements";
 import constants from "../../constants/DataInputConstants";
 
-export default class CargoShipDialog extends Component {
+export default class PickupDialog extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      index: 0,
-      action: 0,
-      object_type: 0,
-      location: 0
-    };
-
-    this.updateButtonIndex = this.updateButtonIndex.bind(this);
-  }
-
-  reset() {
-    this.setState({index: 0})
-}
-
-  updateButtonIndex(index) {
-    action = null;
-    if (index == 0) {
-      action =
-        this.props.object_type == constants.object_type.CARGO
-          ? constants.actions.SHIP_SCORE_CARGO
-          : constants.actions.SHIP_SCORE_HATCH;
-    } else {
-      action =
-        this.props.object_type == constants.object_type.CARGO
-          ? constants.actions.SHIP_MISSED_CARGO
-          : constants.actions.SHIP_MISSED_HATCH;
-    }
-    this.setState({ index, action });
+    this.state = {};
   }
 
   render() {
-    const buttons = ["SCORED", "MISSED"];
-    const { index, action } = this.state;
-    const { object_type, location } = this.props;
-    const name = object_type == constants.object_type.CARGO ? "CARGO" : "HATCH";
+    const { location } = this.props;
     return (
       <View>
         <Dialog
           visible={this.props.visible}
           onTouchOutside={() => {
             this.props.cancelPressed();
-            this.reset();
           }}
           actionsBordered
           dialogStyle={{ width: 500 }}
           dialogTitle={
             <DialogTitle
-              title={name + " Selected"}
+              title={"Pickup"}
               style={{
                 backgroundColor: "#F7F7F8"
               }}
@@ -75,17 +44,18 @@ export default class CargoShipDialog extends Component {
                 bordered
                 onPress={() => {
                   this.props.cancelPressed();
-                  this.reset();
                 }}
                 textStyle={{ fontSize: 15, color: "#008ae6" }}
                 key="button-1"
               />
               <DialogButton
-                text="OK"
+                text="YES"
                 bordered
                 onPress={() => {
-                  this.props.okPressed({ location, action });
-                  this.reset();
+                  this.props.okPressed({
+                    location,
+                    action: constants.actions.PICKUP
+                  });
                 }}
                 textStyle={{ fontSize: 15, color: "#008ae6" }}
                 key="button-2"
@@ -94,13 +64,7 @@ export default class CargoShipDialog extends Component {
           }
         >
           <DialogContent>
-            <Text>What did this team do?</Text>
-            <ButtonGroup
-              onPress={this.updateButtonIndex}
-              selectedIndex={index}
-              buttons={buttons}
-              containerStyle={{ height: 50 }}
-            />
+            <Text>Robot picked up game object?</Text>
           </DialogContent>
         </Dialog>
       </View>
