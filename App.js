@@ -8,7 +8,7 @@ import WelcomeScreen from './src/components/WelcomeScreen'
 import Dashboard from './src/components/Dashboard'
 import ScoutScreen from './src/components/ScoutScreen'
 import MatchesScreen from './src/components/MatchesScreen'
-import DataInputScreen from './src/components/DataInputScreen'
+import DataInputScreen from './src/redux/containers/DataInputScreen.container'
 
 export default class App extends React.Component {
   constructor() {
@@ -129,7 +129,13 @@ const DashboardTabNavigator = createMaterialBottomTabNavigator({
 });
 
 const DashboardStackNavigator = createStackNavigator({
-  DashboardTabNavigator: DashboardTabNavigator
+  DashboardTabNavigator: DashboardTabNavigator,
+  DataInput: {
+    screen: DataInputScreen,
+    navigationOptions: {
+      header: null
+    }
+  }
 }, {
   defaultNavigationOptions: ({navigation}) => {
     return {
@@ -152,9 +158,6 @@ const AppSwitchNavigator = createSwitchNavigator({
   },
   Dashboard: {
     screen: AppDrawerNavigator
-  },
-  DataInput: {
-    screen: DataInputScreen
   }
 });
 

@@ -26,7 +26,7 @@ export default class AutoDialog extends Component {
   }
 
   render() {
-    const buttons = ["NO", "YES"];
+    const buttons = ["YES", "NO"];
     const { index } = this.state;
     return (
       <View>

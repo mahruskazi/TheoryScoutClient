@@ -3,8 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../styles/DataInputScreen.style";
 import constants from "../constants/DataInputConstants";
 import Orientation from "react-native-orientation";
-import { Button } from "react-native-elements";
-import { Icon } from "native-base";
+import { Button, Icon } from "react-native-elements";
 import Toast, { DURATION } from "react-native-easy-toast";
 
 import StartMatchDialog from "./DataInputPopups/StartMatchDialog";
@@ -13,15 +12,13 @@ import RocketDialog from "./DataInputPopups/RocketDialog";
 import AutoDialog from "./DataInputPopups/AutoDialog";
 import PickupDialog from "./DataInputPopups/PickupDialog";
 import OtherDialog from "./DataInputPopups/OtherDialog";
-
-import { connect } from "react-redux";
 import EndGameDialog from "./DataInputPopups/EndGameDialog";
 
 /*
-    This classes is used to collect match data
+    This class is used to collect match data
 */
 
-class DataInputScreen extends Component {
+export default class DataInputScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -118,13 +115,13 @@ class DataInputScreen extends Component {
   };
 
   componentWillUnmount() {
+    Orientation.lockToPortrait();
     Orientation.getOrientation((err, orientation) => {
       console.log(`Current Device Orientation: ${orientation}`);
     });
-
     // Remember to remove listener
     Orientation.removeOrientationListener(this._orientationDidChange);
-    this.clearInterval(this.state.timer);
+    clearInterval(this.state.timer);
   }
 
   tick() {
@@ -273,9 +270,7 @@ class DataInputScreen extends Component {
             sl
           }
         };
-      },
-      () => console.log(JSON.stringify(this.state))
-    );
+      });
   };
 
   _autoDialogConfirmed = data => {
@@ -297,9 +292,7 @@ class DataInputScreen extends Component {
           },
           auto_dialog: false
         };
-      },
-      () => console.log(JSON.stringify(this.state))
-    );
+      });
   };
 
   _rocketDialogPressed(object_type, location) {
@@ -463,54 +456,75 @@ class DataInputScreen extends Component {
               other_dialog: { ...state.other_dialog, visible: false }
             };
         }
-      },
-      () => console.log(JSON.stringify(this.state))
-    );
+      });
   };
 
   _endDialogConfirmed = data => {
-    this.setState(state => {
-      const t = state.counter;
-      let l = [];
-      data.level.map(level => {
-        switch (level) {
-          case 1:
-            if (data.level_one == "climbed") {
-              l.push("1c");
-            } else {
-              l.push("1a");
-            }
-            break;
-          case 2:
-            if (data.level_two == "climbed") {
-              l.push("2c");
-            } else {
-              l.push("2a");
-            }
-            break;
-          case 3:
-            if (data.level_three == "climbed") {
-              l.push("3c");
-            } else {
-              l.push("3a");
-            }
-            break;
-        }
-      });
-
-      return {
-        match_data: {
-          ...state.match_data,
-          e: {
-            l,
-            t,
-            c: data.text
+    this.setState(
+      state => {
+        const t = state.counter;
+        let l = [];
+        data.level.map(level => {
+          switch (level) {
+            case 1:
+              if (data.level_one == "climbed") {
+                l.push("1c");
+              } else {
+                l.push("1a");
+              }
+              break;
+            case 2:
+              if (data.level_two == "climbed") {
+                l.push("2c");
+              } else {
+                l.push("2a");
+              }
+              break;
+            case 3:
+              if (data.level_three == "climbed") {
+                l.push("3c");
+              } else {
+                l.push("3a");
+              }
+              break;
           }
-        },
-        end_dialog: false
-      };
-    }, () => console.log(JSON.stringify(this.state)));
+        });
+
+        return {
+          match_data: {
+            ...state.match_data,
+            e: {
+              l,
+              t,
+              c: data.text
+            }
+          },
+          end_dialog: false
+        };
+      },
+      () => {
+        this.props.addMatch(this.state.match_data)
+        console.log("Finished Scouting Match: " + this.state.match_data.mn)
+        this.props.navigation.goBack()
+      }
+    );
   };
+
+  _renderBasketball() {
+    if (this.state.has_object) {
+      return (
+        <Icon
+          name="ios-basketball"
+          color="orange"
+          type="ionicon"
+          raised
+          reverse
+        />
+      );
+    } else {
+      return null;
+    }
+  }
 
   render() {
     const { cargo_dialog, rocket_dialog, pickup_dialog } = this.state;
@@ -606,8 +620,15 @@ class DataInputScreen extends Component {
             </View>
             <View style={styles.cargo_ship_section}>
               <View style={{ flex: 1, flexDirection: "row" }}>
-                <View style={{ flex: 1, backgroundColor: "white" }}>
-                  {/* BLANK SPACE LEFT BESIDE THE SHIP */}
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
+                  {this._renderBasketball()}
                 </View>
                 <View style={styles.cargo_ship}>
                   <View style={{ flex: 66, flexDirection: "column" }}>
@@ -706,7 +727,8 @@ class DataInputScreen extends Component {
               icon={
                 <Icon
                   name="arrow-back"
-                  style={{ color: "white", paddingRight: 10 }}
+                  color="white"
+                  style={{ paddingRight: 10 }}
                 />
               }
             />
@@ -795,12 +817,3 @@ class DataInputScreen extends Component {
     );
   }
 }
-
-function mapStateToProps(state) {
-  return {
-    matches: state.matches
-  };
-}
-
-//make this component available to the app
-export default connect(mapStateToProps)(DataInputScreen);
