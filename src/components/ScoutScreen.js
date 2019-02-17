@@ -100,7 +100,7 @@ export default class ScoutScreen extends Component {
             <Button
               //size={5}
               type = "solid"
-              onPress={this._onPressButton}
+              onPress={() => this.props.navigation.navigate("DataInput")}
               title="Continue"
             />
           </View>
