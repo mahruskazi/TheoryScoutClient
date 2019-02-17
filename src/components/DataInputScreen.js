@@ -5,13 +5,17 @@ import constants from "../constants/DataInputConstants";
 import Orientation from "react-native-orientation";
 import { Button } from "react-native-elements";
 import { Icon } from "native-base";
-import StartMatchDialog from "./DataInputPopups/StartMatchDialog";
+import Toast, { DURATION } from "react-native-easy-toast";
 
-import { connect } from "react-redux";
+import StartMatchDialog from "./DataInputPopups/StartMatchDialog";
 import CargoShipDialog from "./DataInputPopups/CargoShipDialog";
 import RocketDialog from "./DataInputPopups/RocketDialog";
 import AutoDialog from "./DataInputPopups/AutoDialog";
 import PickupDialog from "./DataInputPopups/PickupDialog";
+import OtherDialog from "./DataInputPopups/OtherDialog";
+
+import { connect } from "react-redux";
+import EndGameDialog from "./DataInputPopups/EndGameDialog";
 
 /*
     This classes is used to collect match data
@@ -40,6 +44,13 @@ class DataInputScreen extends Component {
         location: 0,
         visible: false
       },
+      other_dialog: {
+        action: 0,
+        visible: false,
+        text: "Oops",
+        title: "Not working"
+      },
+      end_dialog: false,
       current_time: "0:00",
       timer: null,
       seconds: 0,
@@ -63,10 +74,9 @@ class DataInputScreen extends Component {
         },
         e: {
           // end game
-          s: 0, // success
-          a: 0, // attempted
-          l: 0, // level
-          t: 0 // time stamp
+          l: [], // level '0a' or '0c' a = attempted, c = climbed
+          t: 0, // time stamp,
+          c: ""
         }
       }
     };
@@ -155,38 +165,73 @@ class DataInputScreen extends Component {
             flex: 1
           }}
         >
-          <Button title="DEFENDED" raised buttonStyle={{}} />
+          <Button
+            title="DEFENDED"
+            raised
+            buttonStyle={{}}
+            onPress={() => this._otherDialogPressed(constants.actions.DEFENDED)}
+          />
           <Button
             title="GOT DEFENDED"
             raised
             buttonStyle={{ backgroundColor: "black" }}
+            onPress={() =>
+              this._otherDialogPressed(constants.actions.GOT_DEFENDED)
+            }
           />
           <Button
             title="DEAD"
             raised
             buttonStyle={{ backgroundColor: "red" }}
+            onPress={() => this._otherDialogPressed(constants.actions.DIED)}
           />
           <Button
             title="DROPPED"
             raised
             buttonStyle={{ backgroundColor: "purple" }}
+            onPress={() => this._otherDialogPressed(constants.actions.DROPPED)}
           />
         </View>
       );
     } else if (this.state.period == constants.period.AUTO) {
       cargo_dialog = this.state.cargo_dialog;
       return (
-        <View style={{ marginLeft: 5, marginRight: 5 }}>
+        <View
+          style={{
+            paddingLeft: 5,
+            paddingRight: 5,
+            alignContent: "space-around",
+            justifyContent: "space-around",
+            flex: 1
+          }}
+        >
+          <Button
+            title="DEAD"
+            raised
+            buttonStyle={{ backgroundColor: "black" }}
+            onPress={() => this._otherDialogPressed(constants.actions.DIED)}
+          />
           <Button
             title="TELE"
             raised
             titleStyle={{ color: "white" }}
-            buttonStyle={{ backgroundColor: "purple", width: 100 }}
+            buttonStyle={{
+              backgroundColor: "blue",
+              width: 100,
+              paddingBottom: 10,
+              paddingTop: 10
+            }}
             onPress={() =>
               this.setState({
                 auto_dialog: true
               })
             }
+          />
+          <Button
+            title="DROPPED"
+            raised
+            buttonStyle={{ backgroundColor: "purple" }}
+            onPress={() => this._otherDialogPressed(constants.actions.DROPPED)}
           />
         </View>
       );
@@ -212,6 +257,7 @@ class DataInputScreen extends Component {
         const match_started = true;
         let sp = data.position;
         let sl = data.level;
+        let has_object = data.object == 0;
         let period = constants.period.AUTO;
 
         return {
@@ -220,6 +266,7 @@ class DataInputScreen extends Component {
           timer,
           period,
           period_color: "yellow",
+          has_object,
           match_data: {
             ...state.match_data,
             sp,
@@ -256,38 +303,109 @@ class DataInputScreen extends Component {
   };
 
   _rocketDialogPressed(object_type, location) {
-    if (this.state.period != constants.period.NOT_STARTED) {
-      this.setState({
-        rocket_dialog: {
-          object_type: object_type,
-          location: location,
-          visible: true
-        }
-      });
+    if (this.state.period == constants.period.NOT_STARTED) {
+      this.refs.toast.show("Match has not started");
+      return;
     }
+
+    if (!this.state.has_object) {
+      this.refs.toast.show("Robot does not have a game object");
+      return;
+    }
+
+    this.setState({
+      rocket_dialog: {
+        object_type: object_type,
+        location: location,
+        visible: true
+      }
+    });
   }
 
   _cargoDialogPressed(object_type, location) {
-    if (this.state.period != constants.period.NOT_STARTED) {
-      this.setState({
-        cargo_dialog: {
-          object_type: object_type,
-          location: location,
-          visible: true
-        }
-      });
+    if (this.state.period == constants.period.NOT_STARTED) {
+      this.refs.toast.show("Match has not started");
+      return;
     }
+
+    if (!this.state.has_object) {
+      this.refs.toast.show("Robot does not have a game object");
+      return;
+    }
+
+    this.setState({
+      cargo_dialog: {
+        object_type: object_type,
+        location: location,
+        visible: true
+      }
+    });
   }
 
   _pickupDialogPressed(location) {
-    if (this.state.period != constants.period.NOT_STARTED) {
-      this.setState({
-        pickup_dialog: {
-          location: location,
-          visible: true
-        }
-      });
+    if (this.state.period == constants.period.NOT_STARTED) {
+      this.refs.toast.show("Match has not started");
+      return;
     }
+
+    if (this.state.has_object) {
+      this.refs.toast.show("Robot already has a game object");
+      return;
+    }
+
+    this.setState({
+      pickup_dialog: {
+        location: location,
+        visible: true
+      }
+    });
+  }
+
+  _otherDialogPressed(action) {
+    if (this.state.period == constants.period.NOT_STARTED) {
+      this.refs.toast.show("Match has not started");
+      return;
+    }
+
+    title = "";
+    text = "";
+
+    switch (action) {
+      case constants.actions.DROPPED:
+        title = "DROPPED";
+        text = "Robot dropped game object?";
+        break;
+      case constants.actions.DIED:
+        title = "DIED";
+        text = "Robot died?";
+        break;
+      case constants.actions.DEFENDED:
+        title = "DEFENDED";
+        text = "Robot played defence?";
+        break;
+      case constants.actions.GOT_DEFENDED:
+        title = "GOT DEFENDED";
+        text = "Robot got defended?";
+        break;
+    }
+
+    this.setState({
+      other_dialog: {
+        action: action,
+        visible: true,
+        title,
+        text
+      }
+    });
+  }
+
+  _endDialogPressed() {
+    if (this.state.period == constants.period.NOT_STARTED) {
+      this.refs.toast.show("Match has not started");
+      return;
+    }
+
+    this.setState({ end_dialog: true });
   }
 
   _dialogConfirmed = data => {
@@ -297,7 +415,7 @@ class DataInputScreen extends Component {
         const l = data.location;
         const t = state.counter;
         const match_data = state.match_data;
-        has_object = state.has_object
+        has_object = state.has_object;
         if (state.period == constants.period.AUTO) {
           match_data.a.a.push({
             a,
@@ -312,10 +430,10 @@ class DataInputScreen extends Component {
           });
         }
 
-        if(data.action <= constants.actions.DROPPED){
+        if (data.action <= constants.actions.DROPPED) {
           has_object = false;
-        } else if (data.action == constants.actions.PICKUP){
-          has_object = true; 
+        } else if (data.action == constants.actions.PICKUP) {
+          has_object = true;
         }
 
         switch (data.location) {
@@ -341,12 +459,57 @@ class DataInputScreen extends Component {
             return {
               match_data,
               has_object,
-              pickup_dialog: { ...state.pickup_dialog, visible: false }
+              pickup_dialog: { ...state.pickup_dialog, visible: false },
+              other_dialog: { ...state.other_dialog, visible: false }
             };
         }
       },
       () => console.log(JSON.stringify(this.state))
     );
+  };
+
+  _endDialogConfirmed = data => {
+    this.setState(state => {
+      const t = state.counter;
+      let l = [];
+      data.level.map(level => {
+        switch (level) {
+          case 1:
+            if (data.level_one == "climbed") {
+              l.push("1c");
+            } else {
+              l.push("1a");
+            }
+            break;
+          case 2:
+            if (data.level_two == "climbed") {
+              l.push("2c");
+            } else {
+              l.push("2a");
+            }
+            break;
+          case 3:
+            if (data.level_three == "climbed") {
+              l.push("3c");
+            } else {
+              l.push("3a");
+            }
+            break;
+        }
+      });
+
+      return {
+        match_data: {
+          ...state.match_data,
+          e: {
+            l,
+            t,
+            c: data.text
+          }
+        },
+        end_dialog: false
+      };
+    }, () => console.log(JSON.stringify(this.state)));
   };
 
   render() {
@@ -371,7 +534,10 @@ class DataInputScreen extends Component {
             >
               <Text style={styles.cargo_depot_text}>CARGO DEPOT</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.end_game}>
+            <TouchableOpacity
+              style={styles.end_game}
+              onPress={() => this._endDialogPressed()}
+            >
               <Text style={styles.end_game_text}>END GAME</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -447,7 +613,13 @@ class DataInputScreen extends Component {
                   <View style={{ flex: 66, flexDirection: "column" }}>
                     <View style={styles.cargo_ship_top_buttons}>
                       <TouchableOpacity
-                        style={[styles.ship_hatch_button, {borderTopLeftRadius: 20, borderBottomLeftRadius: 20}]}
+                        style={[
+                          styles.ship_hatch_button,
+                          {
+                            borderTopLeftRadius: 20,
+                            borderBottomLeftRadius: 20
+                          }
+                        ]}
                         onPress={() =>
                           this._cargoDialogPressed(
                             constants.object_type.HATCH,
@@ -594,6 +766,31 @@ class DataInputScreen extends Component {
           }
           okPressed={this._dialogConfirmed}
         />
+
+        <OtherDialog
+          action={this.state.other_dialog.action}
+          title={this.state.other_dialog.title}
+          text={this.state.other_dialog.text}
+          visible={this.state.other_dialog.visible}
+          cancelPressed={() =>
+            this.setState({
+              other_dialog: { ...other_dialog, visible: false }
+            })
+          }
+          okPressed={this._dialogConfirmed}
+        />
+
+        <EndGameDialog
+          visible={this.state.end_dialog}
+          cancelPressed={() =>
+            this.setState({
+              end_dialog: false
+            })
+          }
+          okPressed={this._endDialogConfirmed}
+        />
+
+        <Toast ref="toast" />
       </View>
     );
   }

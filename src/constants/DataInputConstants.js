@@ -17,7 +17,8 @@ export default {
         RIGHT_DEPOT: 5,
         LEFT_DEPOT: 6,
         RIGHT_FLOOR: 7,
-        LEFT_FLOOR: 8
+        LEFT_FLOOR: 8,
+        NOT_APPLICABLE: -1
     },
     actions: {
         SHIP_SCORE_HATCH: 0,
@@ -40,6 +41,10 @@ export default {
         PICKUP: 17,
         DEFENDED: 18,
         GOT_DEFENDED: 19,
-        DIED: 20
+        DIED: 20,
+        END_LEVEL_ONE: 21,
+        END_LEVEL_TWO: 22,
+        END_LEVEL_THREE: 23,
+        END_DID_NOT_PARK: 24
     }
 }
