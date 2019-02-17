@@ -11,6 +11,7 @@ export default function (state=initialState, action) {
         }
         case 'ADD_MATCH': {
             state.matches.push(action.payload)
+            console.log("MATCH ADDED - Now at: " + state.matches.length)
             return {...state}
         }
         case 'DELETE_MATCH': {
