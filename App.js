@@ -24,6 +24,7 @@ import Dashboard from "./src/components/Dashboard";
 import ScoutScreen from "./src/components/ScoutScreen";
 import MatchesScreen from "./src/components/MatchesScreen";
 import DataInputScreen from "./src/redux/containers/DataInputScreen.container";
+import SettingsScreen from "./src/redux/containers/SettingsScreen.container";
 
 export default class App extends React.Component {
   constructor() {
@@ -170,7 +171,8 @@ const CustomDrawerContentComponent = (props) => (
 const AppDrawerNavigator = createDrawerNavigator({
   Dashboard: {
     screen: DashboardStackNavigator
-  }
+  },
+  Settings: SettingsScreen
 }, {
   contentComponent: CustomDrawerContentComponent
 });
