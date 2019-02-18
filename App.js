@@ -1,14 +1,29 @@
-import React from 'react';
-import { StyleSheet, Platform, Image, Text, View, ScrollView } from 'react-native';
-import { createSwitchNavigator, createAppContainer, createDrawerNavigator, createBottomTabNavigator, createStackNavigator } from 'react-navigation'
-import { Icon } from 'native-base'
-import Orientation from 'react-native-orientation';
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import WelcomeScreen from './src/components/WelcomeScreen'
-import Dashboard from './src/components/Dashboard'
-import ScoutScreen from './src/components/ScoutScreen'
-import MatchesScreen from './src/components/MatchesScreen'
-import DataInputScreen from './src/redux/containers/DataInputScreen.container'
+import React from "react";
+import {
+  StyleSheet,
+  Platform,
+  Image,
+  Text,
+  View,
+  ScrollView
+} from "react-native";
+import {
+  createSwitchNavigator,
+  createAppContainer,
+  createDrawerNavigator,
+  createBottomTabNavigator,
+  createStackNavigator,
+  DrawerItems, 
+  SafeAreaView
+} from "react-navigation";
+import { Icon } from "native-base";
+import Orientation from "react-native-orientation";
+import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
+import WelcomeScreen from "./src/components/WelcomeScreen";
+import Dashboard from "./src/components/Dashboard";
+import ScoutScreen from "./src/components/ScoutScreen";
+import MatchesScreen from "./src/components/MatchesScreen";
+import DataInputScreen from "./src/redux/containers/DataInputScreen.container";
 
 export default class App extends React.Component {
   constructor() {
@@ -23,7 +38,7 @@ export default class App extends React.Component {
     // beginning of the JS runtime.
 
     const initial = Orientation.getInitialOrientation();
-    if (initial === 'PORTRAIT') {
+    if (initial === "PORTRAIT") {
       // do something
     } else {
       // do something else
@@ -43,28 +58,25 @@ export default class App extends React.Component {
     Orientation.addOrientationListener(this._orientationDidChange);
   }
 
-  _orientationDidChange = (orientation) => {
-    if (orientation === 'LANDSCAPE') {
-      console.log("To Landscape")
+  _orientationDidChange = orientation => {
+    if (orientation === "LANDSCAPE") {
+      console.log("To Landscape");
     } else {
       // do something with portrait layout
     }
-  }
+  };
 
   componentWillUnmount() {
     Orientation.getOrientation((err, orientation) => {
       console.log(`Current Device Orientation: ${orientation}`);
     });
 
-
     // Remember to remove listener
     Orientation.removeOrientationListener(this._orientationDidChange);
   }
 
   render() {
-    return (
-      <AppContainer/>
-    );
+    return <AppContainer />;
   }
 }
 
@@ -101,55 +113,66 @@ export default class App extends React.Component {
 //   }
 // })
 
-const DashboardTabNavigator = createMaterialBottomTabNavigator({
-      Scout: {
-        screen: ScoutScreen,
-        navigationOptions: {
-          tabBarLabel: 'SCOUT',
-          tabBarIcon: (
-            <Icon name='aperture' style={{color: 'white'}}/>
-          )
-        }
-      },
-      Matches: {
-        screen: MatchesScreen,
-        navigationOptions: {
-          tabBarLabel: 'MATCHES',
-          tabBarIcon: (
-            <Icon name='eye' style={{color: 'white'}}/>
-          )
-        }
-      },
-}, {
-  initialRouteName: 'Scout',
-  activeColor: '#f0edf6',
-  inactiveColor: '#3e2465',
-  shifting: true,
-  barStyle: { backgroundColor: '#292F6D' },
-});
+const DashboardTabNavigator = createMaterialBottomTabNavigator(
+  {
+    Scout: {
+      screen: ScoutScreen,
+      navigationOptions: {
+        tabBarLabel: "SCOUT",
+        tabBarIcon: <Icon name="aperture" style={{ color: "white" }} />
+      }
+    },
+    Matches: {
+      screen: MatchesScreen,
+      navigationOptions: {
+        tabBarLabel: "MATCHES",
+        tabBarIcon: <Icon name="eye" style={{ color: "white" }} />,
+      }
+    }
+  },
+  {
+    initialRouteName: "Scout",
+    activeColor: "#f0edf6",
+    inactiveColor: "#3e2465",
+    shifting: true,
+    barStyle: { backgroundColor: "#292F6D" }
+  }
+);
 
-const DashboardStackNavigator = createStackNavigator({
-  DashboardTabNavigator: DashboardTabNavigator,
+const DashboardStackNavigator = createStackNavigator(
+{
+  DashboardTabNavigator: {
+    screen: DashboardTabNavigator,
+    navigationOptions: {
+      header: null
+    }
+  },
   DataInput: {
     screen: DataInputScreen,
     navigationOptions: {
       header: null
     }
   }
-}, {
-  defaultNavigationOptions: ({navigation}) => {
-    return {
-      headerLeft: (
-        <Icon name="md-menu" size={30} style={{ marginLeft: 10,}} onPress={() => navigation.openDrawer()}/>
-      )
-    }
-  }
-})
+});
+
+const CustomDrawerContentComponent = (props) => (
+  <ScrollView>
+    <SafeAreaView style={{flex: 1}} forceInset={{ top: 'always', horizontal: 'never' }}>
+      <View style={{height: 150, backgroundColor: '#292F6D', justifyContent: 'center', alignItems: 'center'}}>
+        <Image style={{ height: 100, width: 100}}source={require('./src/assets/shadow_scout.png')}/>
+        <Text style={{color: 'white'}}>Theory Scout Client</Text>
+      </View>
+      <DrawerItems {...props} />
+    </SafeAreaView>
+  </ScrollView>
+);
 
 const AppDrawerNavigator = createDrawerNavigator({
   Dashboard: {
     screen: DashboardStackNavigator
   }
+}, {
+  contentComponent: CustomDrawerContentComponent
 });
 
 const AppSwitchNavigator = createSwitchNavigator({

@@ -57,6 +57,7 @@ export default class DataInputScreen extends Component {
       match_data: {
         mn: 0, // match number
         tn: 1241, // team number
+        c: 'b', // alliance color
         sn: "Kazi", // scout name
         sp: 0, // selected position
         sl: 0, // selected level
