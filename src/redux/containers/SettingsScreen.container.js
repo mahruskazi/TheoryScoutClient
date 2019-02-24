@@ -5,7 +5,7 @@ const mapDispatchToProps = dispatch => ({
   updateEvents: () => {
     dispatch({ type: "FETCH_START" });
 
-    return fetch("https://www.thebluealliance.com/api/v3/events/2019/simple", {
+    return fetch("https://www.thebluealliance.com/api/v3/events/2018/simple", {
       method: "GET",
       headers: new Headers({
         accept: "application/json",

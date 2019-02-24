@@ -21,6 +21,7 @@ import EndGameDialog from "./DataInputPopups/EndGameDialog";
 export default class DataInputScreen extends Component {
   constructor(props) {
     super(props);
+    data = props.navigation.state.params
     this.state = {
       match_started: false,
       period: constants.period.NOT_STARTED,
@@ -55,10 +56,10 @@ export default class DataInputScreen extends Component {
       counter: 0,
       has_object: false,
       match_data: {
-        mn: 0, // match number
-        tn: 1241, // team number
-        c: 'b', // alliance color
-        sn: "Kazi", // scout name
+        mn: data.match_number, // match number
+        tn: data.team_number, // team number
+        c: data.alliance_color, // alliance color
+        sn: data.scout_name, // scout name
         sp: 0, // selected position
         sl: 0, // selected level
         a: {
@@ -506,6 +507,7 @@ export default class DataInputScreen extends Component {
       () => {
         this.props.addMatch(this.state.match_data)
         console.log("Finished Scouting Match: " + this.state.match_data.mn)
+        this.props.navigation.state.params.onGoBack();
         this.props.navigation.goBack()
       }
     );
