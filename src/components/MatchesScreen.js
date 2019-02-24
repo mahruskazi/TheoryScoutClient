@@ -10,8 +10,14 @@ class MatchesScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeSections: []
+      activeSections: [],
+      matches: this.props.matches
     };
+  }
+
+  componentWillReceiveProps(props) {
+    console.log("UPDATED")
+    this.setState({matches: props.matches})
   }
 
   _renderHeader = section => {
@@ -56,6 +62,7 @@ class MatchesScreen extends Component {
         <Text>Left Rocket Cargo Scored (L/M/H): {this.getLRCargoStats(tele_stats)}</Text>
         <Text style={{ fontWeight: "bold" }}>End Game</Text>
         <Text>Level order: {JSON.stringify(section.e.l)}</Text>
+        <Text>Comments: {section.e.c}</Text>
       </View>
     );
   };
@@ -270,7 +277,7 @@ class MatchesScreen extends Component {
         </View>
         <ScrollView style={{flex: 1}}>
           <Accordion
-            sections={this.props.matches}
+            sections={this.state.matches}
             activeSections={this.state.activeSections}
             renderHeader={this._renderHeader}
             renderContent={this._renderContent}

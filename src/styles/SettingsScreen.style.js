@@ -32,5 +32,11 @@ export default StyleSheet.create({
     },
     event_text: {
         fontSize: 13
+    },
+    input_orientation: {
+        height: 150,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });

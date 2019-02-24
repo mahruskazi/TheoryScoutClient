@@ -172,7 +172,9 @@ const AppDrawerNavigator = createDrawerNavigator({
   Dashboard: {
     screen: DashboardStackNavigator
   },
-  Settings: SettingsScreen
+  Settings: {
+    screen: SettingsScreen,
+  }
 }, {
   contentComponent: CustomDrawerContentComponent
 });

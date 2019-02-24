@@ -7,12 +7,15 @@ const initialState = {
 export default function (state=initialState, action) {
     switch(action.type){
         case 'DELETE_ALL_MATCHES': {
+            console.log("Deleted all scouted matches")
             return {...state, matches: []}
         }
         case 'ADD_MATCH': {
-            state.matches.push(action.payload)
-            console.log("MATCH ADDED - Now at: " + state.matches.length)
-            return {...state}
+            matches = []
+            state.matches.map(match => { matches.push(match)})
+            matches.push(action.payload)
+            console.log("MATCH ADDED - Now at: " + matches.length)
+            return {...state, matches}
         }
         case 'DELETE_MATCH': {
             //TODO: Add option to delete match

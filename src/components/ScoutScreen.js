@@ -124,7 +124,7 @@ class ScoutScreen extends Component {
   };
 
   updateMatchNumber() {
-    this.setState({match_number: this.state.match_number + 1})
+    this.setState({match_number: parseInt(this.state.match_number) + 1})
   }
 
   render() {
