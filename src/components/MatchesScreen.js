@@ -16,7 +16,6 @@ class MatchesScreen extends Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log("UPDATED")
     this.setState({matches: props.matches})
   }
 
@@ -32,6 +31,7 @@ class MatchesScreen extends Component {
             name="md-qr-scanner"
             type="ionicon"
             color="black"
+            onPress={() => this.props.navigation.navigate('QrScreen', { data: section })}
           />
         </View>
       </View>

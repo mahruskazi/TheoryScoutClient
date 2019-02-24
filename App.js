@@ -13,18 +13,18 @@ import {
   createDrawerNavigator,
   createBottomTabNavigator,
   createStackNavigator,
-  DrawerItems, 
+  DrawerItems,
   SafeAreaView
 } from "react-navigation";
 import { Icon } from "native-base";
 import Orientation from "react-native-orientation";
 import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
 import WelcomeScreen from "./src/components/WelcomeScreen";
-import Dashboard from "./src/components/Dashboard";
 import ScoutScreen from "./src/components/ScoutScreen";
 import MatchesScreen from "./src/components/MatchesScreen";
 import DataInputScreen from "./src/redux/containers/DataInputScreen.container";
 import SettingsScreen from "./src/redux/containers/SettingsScreen.container";
+import QrCodeGenerator from "./src/components/QrCodeGenerator";
 
 export default class App extends React.Component {
   constructor() {
@@ -127,7 +127,7 @@ const DashboardTabNavigator = createMaterialBottomTabNavigator(
       screen: MatchesScreen,
       navigationOptions: {
         tabBarLabel: "MATCHES",
-        tabBarIcon: <Icon name="eye" style={{ color: "white" }} />,
+        tabBarIcon: <Icon name="eye" style={{ color: "white" }} />
       }
     }
   },
@@ -141,43 +141,66 @@ const DashboardTabNavigator = createMaterialBottomTabNavigator(
 );
 
 const DashboardStackNavigator = createStackNavigator(
-{
-  DashboardTabNavigator: {
-    screen: DashboardTabNavigator,
-    navigationOptions: {
-      header: null
+  {
+    DashboardTabNavigator: {
+      screen: DashboardTabNavigator,
+      navigationOptions: {
+        header: null
+      }
+    },
+    DataInput: {
+      screen: DataInputScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+    QrScreen: {
+      screen: QrCodeGenerator
     }
   },
-  DataInput: {
-    screen: DataInputScreen,
-    navigationOptions: {
-      header: null
-    }
+  {
+    mode: "modal"
   }
-});
+);
 
-const CustomDrawerContentComponent = (props) => (
+const CustomDrawerContentComponent = props => (
   <ScrollView>
-    <SafeAreaView style={{flex: 1}} forceInset={{ top: 'always', horizontal: 'never' }}>
-      <View style={{height: 150, backgroundColor: '#292F6D', justifyContent: 'center', alignItems: 'center'}}>
-        <Image style={{ height: 100, width: 100}}source={require('./src/assets/shadow_scout.png')}/>
-        <Text style={{color: 'white'}}>Theory Scout Client</Text>
+    <SafeAreaView
+      style={{ flex: 1 }}
+      forceInset={{ top: "always", horizontal: "never" }}
+    >
+      <View
+        style={{
+          height: 150,
+          backgroundColor: "#292F6D",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <Image
+          style={{ height: 100, width: 100 }}
+          source={require("./src/assets/shadow_scout.png")}
+        />
+        <Text style={{ color: "white" }}>Theory Scout Client</Text>
       </View>
       <DrawerItems {...props} />
     </SafeAreaView>
   </ScrollView>
 );
 
-const AppDrawerNavigator = createDrawerNavigator({
-  Dashboard: {
-    screen: DashboardStackNavigator
+const AppDrawerNavigator = createDrawerNavigator(
+  {
+    Dashboard: {
+      screen: DashboardStackNavigator
+    },
+    Settings: {
+      screen: SettingsScreen
+    }
   },
-  Settings: {
-    screen: SettingsScreen,
+  {
+    contentComponent: CustomDrawerContentComponent
   }
-}, {
-  contentComponent: CustomDrawerContentComponent
-});
+);
 
 const AppSwitchNavigator = createSwitchNavigator({
   WelcomeScreen: {
