@@ -16,8 +16,9 @@ class MatchesScreen extends Component {
   }
 
   componentWillReceiveProps(props) {
+    console.log("UPDATED")
     this.setState({matches: props.matches})
-}
+  }
 
   _renderHeader = section => {
     return (
@@ -61,6 +62,7 @@ class MatchesScreen extends Component {
         <Text>Left Rocket Cargo Scored (L/M/H): {this.getLRCargoStats(tele_stats)}</Text>
         <Text style={{ fontWeight: "bold" }}>End Game</Text>
         <Text>Level order: {JSON.stringify(section.e.l)}</Text>
+        <Text>Comments: {section.e.c}</Text>
       </View>
     );
   };

@@ -605,8 +605,7 @@ class DataInputScreen extends Component {
   }
 
   render() {
-    const { cargo_dialog, rocket_dialog, pickup_dialog } = this.state;
-    console.log(this.state.flip);
+    const { cargo_dialog, rocket_dialog, pickup_dialog, other_dialog } = this.state;
     return (
       <View style={{ flex: 1, flexDirection: this.state.flip }}>
         <View style={styles.hab_buttons}>

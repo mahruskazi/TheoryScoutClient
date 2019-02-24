@@ -114,14 +114,14 @@ class SettingsScreen extends Component {
             <Icon name="md-calendar" type="ionicon" color="#e65c00" reverse />
           </TouchableOpacity>
 
-          <Text style={styles.heading_text}>Delete Events</Text>
+          <Text style={styles.heading_text}>Delete Matches</Text>
           <TouchableOpacity
             style={styles.select_event_button}
             onPress={() => {
               this.setState({ delete_dialog: true });
             }}
           >
-            <Text style={styles.event_text}>Click here to delete events</Text>
+            <Text style={styles.event_text}>Click here to delete match data</Text>
             <Icon name="md-trash" type="ionicon" color="#e65c00" reverse />
           </TouchableOpacity>
 
