@@ -28,8 +28,8 @@ class EventPopup extends Component {
     };
   }
 
-  componentWillReceiveProps(props) {
-      this.setState({events: props.events})
+  componentWillMount() {
+      
   }
 
   searchUpdated(term) {
@@ -55,7 +55,7 @@ class EventPopup extends Component {
           dialogStyle={{ width: 350 }}
           dialogTitle={
             <DialogTitle
-              title={"Select an event"}
+              title={"Delete Match Data"}
               style={{
                 backgroundColor: "#F7F7F8"
               }}
@@ -75,10 +75,10 @@ class EventPopup extends Component {
                 key="button-1"
               />
               <DialogButton
-                text="OK"
+                text="YES"
                 bordered
                 onPress={() => {
-                    this.props.okPressed(this.state);
+                    this.props.okPressed();
                 }}
                 textStyle={{ fontSize: 15, color: "#008ae6" }}
                 key="button-2"
@@ -87,36 +87,7 @@ class EventPopup extends Component {
           }
         >
           <DialogContent>
-            <Text>Enter event name or key</Text>
-            <TextInput
-              onChangeText={term => {
-                this.searchUpdated(term);
-              }}
-              placeholder="Type a message to search"
-              value={searchTerm}
-            />
-            <View>
-              {filteredEvents.slice(0, items_to_show).map(event => {
-                return (
-                  <TouchableOpacity
-                    onPress={() =>
-                      this.setState({
-                        searchTerm: event.name,
-                        selected_event: event
-                      })
-                    }
-                    key={event.key}
-                    style={{
-                      height: 40,
-                      justifyContent: "center",
-                      borderBottomWidth: StyleSheet.hairlineWidth
-                    }}
-                  >
-                    <Text>{event.name}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            <Text>Are you sure?</Text>
           </DialogContent>
         </Dialog>
       </View>

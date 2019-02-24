@@ -3,7 +3,6 @@ import {StyleSheet} from 'react-native';
 export default StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row',
     },
     hab_buttons: {
         flex: 20,
@@ -61,7 +60,6 @@ export default StyleSheet.create({
     floor_section: {
         backgroundColor: 'white',
         flex: 15,
-        flexDirection: 'row',
         alignItems: 'center'
     },
     pickup_button: {
@@ -72,6 +70,7 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 10,
+        marginRight: 10
     },
     cargo_ship_section: {
         flex: 30,

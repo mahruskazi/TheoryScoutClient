@@ -27,7 +27,7 @@ const mapDispatchToProps = dispatch => ({
   },
   updateTeams: key => {
     dispatch({ type: "FETCH_START" });
-
+    console.log("Updating teams with key: " + key);
     return fetch("https://www.thebluealliance.com/api/v3/event/" + key + "/teams/simple", {
       method: "GET",
       headers: new Headers({
@@ -47,6 +47,7 @@ const mapDispatchToProps = dispatch => ({
   },
   updateMatches: key => {
     dispatch({ type: "FETCH_START" });
+    console.log("Updating matches with key: " + key);
 
     return fetch("https://www.thebluealliance.com/api/v3/event/" + key + "/matches/simple", {
       method: "GET",
@@ -64,6 +65,12 @@ const mapDispatchToProps = dispatch => ({
       .catch(error => {
         dispatch({type: 'FETCH_ERROR', payload: error})
       });
+  },
+  deleteMatches: () => {
+    dispatch({ type: "DELETE_ALL_MATCHES" });
+  },
+  setOrientation: state => {
+    dispatch({ type: "SET_ORIENTATION", payload: state });
   }
 });
 

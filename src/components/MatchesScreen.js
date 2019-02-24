@@ -10,9 +10,14 @@ class MatchesScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeSections: []
+      activeSections: [],
+      matches: this.props.matches
     };
   }
+
+  componentWillReceiveProps(props) {
+    this.setState({matches: props.matches})
+}
 
   _renderHeader = section => {
     return (
@@ -270,7 +275,7 @@ class MatchesScreen extends Component {
         </View>
         <ScrollView style={{flex: 1}}>
           <Accordion
-            sections={this.props.matches}
+            sections={this.state.matches}
             activeSections={this.state.activeSections}
             renderHeader={this._renderHeader}
             renderContent={this._renderContent}

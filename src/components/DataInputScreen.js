@@ -14,20 +14,28 @@ import PickupDialog from "./DataInputPopups/PickupDialog";
 import OtherDialog from "./DataInputPopups/OtherDialog";
 import EndGameDialog from "./DataInputPopups/EndGameDialog";
 
+import { connect } from "react-redux";
+
 /*
     This class is used to collect match data
 */
 
-export default class DataInputScreen extends Component {
+class DataInputScreen extends Component {
   constructor(props) {
     super(props);
-    data = props.navigation.state.params
+    data = props.navigation.state.params;
+    set =
+      data.alliance_color == "red"
+        ? this.props.settings.orientation
+        : -this.props.settings.orientation;
+    flip = set == 1 ? "row" : "row-reverse";
     this.state = {
       match_started: false,
       period: constants.period.NOT_STARTED,
       period_color: "#f2f2f2",
       start_dialog: false,
       auto_dialog: false,
+      flip,
       cargo_dialog: {
         location: 0,
         object_type: 0,
@@ -248,53 +256,121 @@ export default class DataInputScreen extends Component {
     }
   }
 
+  renderCargoShip() {
+    if (this.state.flip == "row") {
+      return (
+        <View style={styles.cargo_ship_top_buttons}>
+          <TouchableOpacity
+            style={[
+              styles.ship_hatch_button,
+              {
+                borderTopLeftRadius: 20,
+                borderBottomLeftRadius: 20
+              }
+            ]}
+            onPress={() =>
+              this._cargoDialogPressed(
+                constants.object_type.HATCH,
+                constants.locations.CARGO_SHIP
+              )
+            }
+          >
+            <Text style={styles.hatch_button_text}>HATCH</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.ship_cargo_button}
+            onPress={() =>
+              this._cargoDialogPressed(
+                constants.object_type.CARGO,
+                constants.locations.CARGO_SHIP
+              )
+            }
+          >
+            <Text style={styles.cargo_button_text}>CARGO</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.cargo_ship_top_buttons}>
+          <TouchableOpacity
+            style={styles.ship_cargo_button}
+            onPress={() =>
+              this._cargoDialogPressed(
+                constants.object_type.CARGO,
+                constants.locations.CARGO_SHIP
+              )
+            }
+          >
+            <Text style={styles.cargo_button_text}>CARGO</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.ship_hatch_button,
+              {
+                borderTopRightRadius: 20,
+                borderBottomRightRadius: 20
+              }
+            ]}
+            onPress={() =>
+              this._cargoDialogPressed(
+                constants.object_type.HATCH,
+                constants.locations.CARGO_SHIP
+              )
+            }
+          >
+            <Text style={styles.hatch_button_text}>HATCH</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+  }
+
   _startDialogConfirmed = data => {
     let timer = setInterval(this.tick.bind(this), 1000);
-    this.setState(
-      state => {
-        const start_dialog = false;
-        const match_started = true;
-        let sp = data.position;
-        let sl = data.level;
-        let has_object = data.object == 0;
-        let period = constants.period.AUTO;
+    this.setState(state => {
+      const start_dialog = false;
+      const match_started = true;
+      let sp = data.position;
+      let sl = data.level;
+      let has_object = data.object == 0;
+      let period = constants.period.AUTO;
 
-        return {
-          start_dialog,
-          match_started,
-          timer,
-          period,
-          period_color: "yellow",
-          has_object,
-          match_data: {
-            ...state.match_data,
-            sp,
-            sl
-          }
-        };
-      });
+      return {
+        start_dialog,
+        match_started,
+        timer,
+        period,
+        period_color: "yellow",
+        has_object,
+        match_data: {
+          ...state.match_data,
+          sp,
+          sl
+        }
+      };
+    });
   };
 
   _autoDialogConfirmed = data => {
-    this.setState(
-      state => {
-        let period = constants.period.TELE;
-        let period_color = "green";
-        hs = data.index;
+    this.setState(state => {
+      let period = constants.period.TELE;
+      let period_color = "green";
+      hs = data.index;
 
-        return {
-          period,
-          period_color,
-          match_data: {
-            ...state.match_data,
-            a: {
-              ...state.match_data.a,
-              hs
-            }
-          },
-          auto_dialog: false
-        };
-      });
+      return {
+        period,
+        period_color,
+        match_data: {
+          ...state.match_data,
+          a: {
+            ...state.match_data.a,
+            hs
+          }
+        },
+        auto_dialog: false
+      };
+    });
   };
 
   _rocketDialogPressed(object_type, location) {
@@ -404,61 +480,60 @@ export default class DataInputScreen extends Component {
   }
 
   _dialogConfirmed = data => {
-    this.setState(
-      state => {
-        const a = data.action;
-        const l = data.location;
-        const t = state.counter;
-        const match_data = state.match_data;
-        has_object = state.has_object;
-        if (state.period == constants.period.AUTO) {
-          match_data.a.a.push({
-            a,
-            l,
-            t
-          });
-        } else {
-          match_data.t.a.push({
-            a,
-            l,
-            t
-          });
-        }
+    this.setState(state => {
+      const a = data.action;
+      const l = data.location;
+      const t = state.counter;
+      const match_data = state.match_data;
+      has_object = state.has_object;
+      if (state.period == constants.period.AUTO) {
+        match_data.a.a.push({
+          a,
+          l,
+          t
+        });
+      } else {
+        match_data.t.a.push({
+          a,
+          l,
+          t
+        });
+      }
 
-        if (data.action <= constants.actions.DROPPED) {
-          has_object = false;
-        } else if (data.action == constants.actions.PICKUP) {
-          has_object = true;
-        }
+      if (data.action <= constants.actions.DROPPED) {
+        has_object = false;
+      } else if (data.action == constants.actions.PICKUP) {
+        has_object = true;
+      }
 
-        switch (data.location) {
-          case constants.locations.CARGO_SHIP:
-            return {
-              match_data,
-              has_object,
-              cargo_dialog: { ...state.cargo_dialog, visible: false }
-            };
-          case constants.locations.RIGHT_ROCKET:
-            return {
-              match_data,
-              has_object,
-              rocket_dialog: { ...state.rocket_dialog, visible: false }
-            };
-          case constants.locations.LEFT_ROCKET:
-            return {
-              match_data,
-              has_object,
-              rocket_dialog: { ...state.rocket_dialog, visible: false }
-            };
-          default:
-            return {
-              match_data,
-              has_object,
-              pickup_dialog: { ...state.pickup_dialog, visible: false },
-              other_dialog: { ...state.other_dialog, visible: false }
-            };
-        }
-      });
+      switch (data.location) {
+        case constants.locations.CARGO_SHIP:
+          return {
+            match_data,
+            has_object,
+            cargo_dialog: { ...state.cargo_dialog, visible: false }
+          };
+        case constants.locations.RIGHT_ROCKET:
+          return {
+            match_data,
+            has_object,
+            rocket_dialog: { ...state.rocket_dialog, visible: false }
+          };
+        case constants.locations.LEFT_ROCKET:
+          return {
+            match_data,
+            has_object,
+            rocket_dialog: { ...state.rocket_dialog, visible: false }
+          };
+        default:
+          return {
+            match_data,
+            has_object,
+            pickup_dialog: { ...state.pickup_dialog, visible: false },
+            other_dialog: { ...state.other_dialog, visible: false }
+          };
+      }
+    });
   };
 
   _endDialogConfirmed = data => {
@@ -505,10 +580,10 @@ export default class DataInputScreen extends Component {
         };
       },
       () => {
-        this.props.addMatch(this.state.match_data)
-        console.log("Finished Scouting Match: " + this.state.match_data.mn)
+        this.props.addMatch(this.state.match_data);
+        console.log("Finished Scouting Match: " + this.state.match_data.mn);
         this.props.navigation.state.params.onGoBack();
-        this.props.navigation.goBack()
+        this.props.navigation.goBack();
       }
     );
   };
@@ -531,8 +606,9 @@ export default class DataInputScreen extends Component {
 
   render() {
     const { cargo_dialog, rocket_dialog, pickup_dialog } = this.state;
+    console.log(this.state.flip);
     return (
-      <View style={styles.container}>
+      <View style={{ flex: 1, flexDirection: this.state.flip }}>
         <View style={styles.hab_buttons}>
           <View style={{ flex: 1 }}>
             <TouchableOpacity
@@ -611,7 +687,9 @@ export default class DataInputScreen extends Component {
               </View>
               <View style={{ flex: 25, backgroundColor: "white" }} />
             </View>
-            <View style={styles.floor_section}>
+            <View
+              style={[styles.floor_section, { flexDirection: this.state.flip }]}
+            >
               <TouchableOpacity
                 style={styles.pickup_button}
                 onPress={() =>
@@ -622,7 +700,7 @@ export default class DataInputScreen extends Component {
               </TouchableOpacity>
             </View>
             <View style={styles.cargo_ship_section}>
-              <View style={{ flex: 1, flexDirection: "row" }}>
+              <View style={{ flex: 1, flexDirection: this.state.flip }}>
                 <View
                   style={{
                     flex: 1,
@@ -635,41 +713,14 @@ export default class DataInputScreen extends Component {
                 </View>
                 <View style={styles.cargo_ship}>
                   <View style={{ flex: 66, flexDirection: "column" }}>
-                    <View style={styles.cargo_ship_top_buttons}>
-                      <TouchableOpacity
-                        style={[
-                          styles.ship_hatch_button,
-                          {
-                            borderTopLeftRadius: 20,
-                            borderBottomLeftRadius: 20
-                          }
-                        ]}
-                        onPress={() =>
-                          this._cargoDialogPressed(
-                            constants.object_type.HATCH,
-                            constants.locations.CARGO_SHIP
-                          )
-                        }
-                      >
-                        <Text style={styles.hatch_button_text}>HATCH</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.ship_cargo_button}
-                        onPress={() =>
-                          this._cargoDialogPressed(
-                            constants.object_type.CARGO,
-                            constants.locations.CARGO_SHIP
-                          )
-                        }
-                      >
-                        <Text style={styles.cargo_button_text}>CARGO</Text>
-                      </TouchableOpacity>
-                    </View>
+                    {this.renderCargoShip()}
                   </View>
                 </View>
               </View>
             </View>
-            <View style={styles.floor_section}>
+            <View
+              style={[styles.floor_section, { flexDirection: this.state.flip }]}
+            >
               <TouchableOpacity
                 style={styles.pickup_button}
                 onPress={() =>
@@ -727,6 +778,7 @@ export default class DataInputScreen extends Component {
             <Button
               title="BACK"
               buttonStyle={{ backgroundColor: "#c0c0c0" }}
+              onPress={() => this.props.navigation.goBack()}
               icon={
                 <Icon
                   name="arrow-back"
@@ -820,3 +872,12 @@ export default class DataInputScreen extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    settings: state.settings
+  };
+}
+
+//make this component available to the app
+export default connect(mapStateToProps)(DataInputScreen);
