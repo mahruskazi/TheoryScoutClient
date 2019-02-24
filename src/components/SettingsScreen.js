@@ -41,6 +41,7 @@ class SettingsScreen extends Component {
     });
     this.props.updateCurrentEvent(data.selected_event.key, data.searchTerm);
     this.props.updateTeams(data.selected_event.key);
+    this.props.updateMatches(data.selected_event.key)
   };
 
   render() {

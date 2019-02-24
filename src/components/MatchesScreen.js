@@ -263,7 +263,6 @@ class MatchesScreen extends Component {
   };
 
   render() {
-    console.log(JSON.stringify(this.state.activeSections))
     return (
       <View style={styles.container}>
         <View style={styles.header}>
