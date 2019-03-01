@@ -114,8 +114,8 @@ class ScoutScreen extends Component {
       return;
     }
     props = {
-      match_number: this.state.match_number,
-      team_number: this.state.selected_team,
+      match_number: parseInt(this.state.match_number),
+      team_number: parseInt(this.state.selected_team),
       alliance_color: this.state.alliance_color,
       scout_name: this.state.name,
       onGoBack: () => this.updateMatchNumber()
