@@ -476,6 +476,11 @@ class DataInputScreen extends Component {
       return;
     }
 
+    if (this.state.period == constants.period.AUTO) {
+      this.refs.toast.show("Still auto period");
+      return;
+    }
+
     this.setState({ end_dialog: true });
   }
 
