@@ -56,6 +56,12 @@ class DataInputScreen extends Component {
         text: "Oops",
         title: "Not working"
       },
+      user_dialog: {
+        action: 0,
+        visible: false,
+        text: "Oops",
+        title: "Not Working"
+      },
       end_dialog: false,
       current_time: "0:00",
       timer: null,
@@ -294,24 +300,7 @@ class DataInputScreen extends Component {
       return (
         <View style={styles.cargo_ship_top_buttons}>
           <TouchableOpacity
-            style={styles.ship_cargo_button}
-            onPress={() =>
-              this._cargoDialogPressed(
-                constants.object_type.CARGO,
-                constants.locations.CARGO_SHIP
-              )
-            }
-          >
-            <Text style={styles.cargo_button_text}>CARGO</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.ship_hatch_button,
-              {
-                borderTopRightRadius: 20,
-                borderBottomRightRadius: 20
-              }
-            ]}
+            style={styles.ship_hatch_button}
             onPress={() =>
               this._cargoDialogPressed(
                 constants.object_type.HATCH,
@@ -319,7 +308,24 @@ class DataInputScreen extends Component {
               )
             }
           >
-            <Text style={styles.hatch_button_text}>HATCH</Text>
+            <Text style={styles.cargo_button_text}>HATCH</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.ship_cargo_button,
+              {
+                borderTopRightRadius: 20,
+                borderBottomRightRadius: 20
+              }
+            ]}
+            onPress={() =>
+              this._cargoDialogPressed(
+                constants.object_type.CARGO,
+                constants.locations.CARGO_SHIP
+              )
+            }
+          >
+            <Text style={styles.hatch_button_text}>CARGO</Text>
           </TouchableOpacity>
         </View>
       );
@@ -476,7 +482,42 @@ class DataInputScreen extends Component {
       return;
     }
 
+    if (this.state.period == constants.period.AUTO) {
+      this.refs.toast.show("Still auto period");
+      return;
+    }
+
     this.setState({ end_dialog: true });
+  }
+
+  _userDialogPressed(action) {
+    if (action == "BACK") {
+      this.setState({
+        user_dialog: {
+          visible: true,
+          action,
+          title: "Go Back",
+          text: "Are you sure you want to go back?"
+        }
+      });
+      return;
+    } 
+
+    if (this.state.period == constants.period.NOT_STARTED) {
+      this.refs.toast.show("Match has not started");
+      return;
+    }
+    
+    if (action == "UNDO") {
+      this.setState({
+        user_dialog: {
+          visible: true,
+          action,
+          title: "Undo last action",
+          text: "Are you sure you want to undo?"
+        }
+      });
+    }
   }
 
   _dialogConfirmed = data => {
@@ -484,6 +525,16 @@ class DataInputScreen extends Component {
       const a = data.action;
       const l = data.location;
       const t = state.counter;
+      console.log(
+        "PERIOD: " +
+          state.period +
+          " action: " +
+          a +
+          " location: " +
+          l +
+          " time: " +
+          t
+      );
       const match_data = state.match_data;
       has_object = state.has_object;
       if (state.period == constants.period.AUTO) {
@@ -588,6 +639,29 @@ class DataInputScreen extends Component {
     );
   };
 
+  _userDialogConfirmed = data => {
+    if (data.action == "BACK") {
+      this.props.navigation.goBack();
+      this.setState({
+        user_dialog: { ...this.state.user_dialog, visible: false }
+      });
+    } else if (data.action == "UNDO") {
+      this.setState(state => {
+        const match_data = state.match_data;
+        if (state.period == constants.period.AUTO) {
+          if (match_data.a.a.length > 0) match_data.a.a.pop();
+        } else {
+          if (match_data.t.a.length > 0) match_data.t.a.pop();
+        }
+        console.log("UNDO PRESSED");
+        return {
+          match_data,
+          user_dialog: { ...this.state.user_dialog, visible: false }
+        };
+      });
+    }
+  };
+
   _renderBasketball() {
     if (this.state.has_object) {
       return (
@@ -605,7 +679,13 @@ class DataInputScreen extends Component {
   }
 
   render() {
-    const { cargo_dialog, rocket_dialog, pickup_dialog, other_dialog } = this.state;
+    const {
+      cargo_dialog,
+      rocket_dialog,
+      pickup_dialog,
+      other_dialog,
+      user_dialog
+    } = this.state;
     return (
       <View style={{ flex: 1, flexDirection: this.state.flip }}>
         <View style={styles.hab_buttons}>
@@ -705,10 +785,19 @@ class DataInputScreen extends Component {
                     flex: 1,
                     backgroundColor: "white",
                     justifyContent: "center",
-                    alignItems: "center"
+                    alignItems: "center",
+                    flexDirection: "row"
                   }}
                 >
                   {this._renderBasketball()}
+                  <Icon
+                    name="md-undo"
+                    color="red"
+                    type="ionicon"
+                    raised
+                    reverse
+                    onPress={() => this._userDialogPressed("UNDO")}
+                  />
                 </View>
                 <View style={styles.cargo_ship}>
                   <View style={{ flex: 66, flexDirection: "column" }}>
@@ -777,7 +866,7 @@ class DataInputScreen extends Component {
             <Button
               title="BACK"
               buttonStyle={{ backgroundColor: "#c0c0c0" }}
-              onPress={() => this.props.navigation.goBack()}
+              onPress={() => this._userDialogPressed("BACK")}
               icon={
                 <Icon
                   name="arrow-back"
@@ -864,6 +953,19 @@ class DataInputScreen extends Component {
             })
           }
           okPressed={this._endDialogConfirmed}
+        />
+
+        <OtherDialog
+          action={this.state.user_dialog.action}
+          title={this.state.user_dialog.title}
+          text={this.state.user_dialog.text}
+          visible={this.state.user_dialog.visible}
+          cancelPressed={() =>
+            this.setState({
+              user_dialog: { ...user_dialog, visible: false }
+            })
+          }
+          okPressed={this._userDialogConfirmed}
         />
 
         <Toast ref="toast" />

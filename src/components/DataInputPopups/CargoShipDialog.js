@@ -17,35 +17,52 @@ export default class CargoShipDialog extends Component {
       index: 0,
       action: 0,
       object_type: 0,
-      location: 0
+      location: 0,
+      button_color: 'green'
     };
 
     this.updateButtonIndex = this.updateButtonIndex.bind(this);
   }
 
   reset() {
-    this.setState({index: 0})
+    this.setState({index: 0, button_color: 'green'})
 }
 
-  updateButtonIndex(index) {
+  async updateButtonIndex(index) {
     action = null;
     if (index == 0) {
+      button_color = 'green'
       action =
         this.props.object_type == constants.object_type.CARGO
           ? constants.actions.SHIP_SCORE_CARGO
           : constants.actions.SHIP_SCORE_HATCH;
     } else {
+      button_color = 'red'
       action =
         this.props.object_type == constants.object_type.CARGO
           ? constants.actions.SHIP_MISSED_CARGO
           : constants.actions.SHIP_MISSED_HATCH;
     }
-    this.setState({ index, action });
+    await this.promisedSetState({ index, action, button_color });
+  }
+
+  promisedSetState = (newState) => {
+    return new Promise((resolve) => {
+        this.setState(newState, () => {
+            resolve()
+        });
+    });
+  }
+
+  async final_action(location) {
+    await this.updateButtonIndex(this.state.index)
+    this.props.okPressed({ location, action: this.state.action });
+    this.reset();
   }
 
   render() {
     const buttons = ["SCORED", "MISSED"];
-    const { index, action } = this.state;
+    const { index } = this.state;
     const { object_type, location } = this.props;
     const name = object_type == constants.object_type.CARGO ? "CARGO" : "HATCH";
     return (
@@ -84,8 +101,7 @@ export default class CargoShipDialog extends Component {
                 text="OK"
                 bordered
                 onPress={() => {
-                  this.props.okPressed({ location, action });
-                  this.reset();
+                  this.final_action(location)
                 }}
                 textStyle={{ fontSize: 15, color: "#008ae6" }}
                 key="button-2"
@@ -100,6 +116,7 @@ export default class CargoShipDialog extends Component {
               selectedIndex={index}
               buttons={buttons}
               containerStyle={{ height: 50 }}
+              selectedButtonStyle={{backgroundColor: this.state.button_color}}
             />
           </DialogContent>
         </Dialog>
