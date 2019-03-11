@@ -18,7 +18,8 @@ export default class RocketDialog extends Component {
       action: 0,
       object_type: 0,
       location: 0,
-      level: 0
+      level: 0,
+      button_color: 'green'
     };
 
     this.updateOutcomeIndex = this.updateOutcomeIndex.bind(this);
@@ -26,17 +27,33 @@ export default class RocketDialog extends Component {
   }
 
   reset() {
-      this.setState({outcome: 0, level: 0})
+      this.setState({outcome: 0, level: 0, button_color: 'green'})
   }
 
-  updateOutcomeIndex(outcome) {
+  async updateOutcomeIndex(outcome) {
     action = this.get_action(outcome, this.state.level, this.props.object_type);
-    this.setState({ outcome, action });
+    button_color = outcome == 0 ? 'green' : 'red'; 
+    await this.promisedSetState({ outcome, action, button_color });
   }
 
-  updateLevelIndex(level) {
+  async updateLevelIndex(level) {
     action = this.get_action(this.state.outcome, level, this.props.object_type);
-    this.setState({ level, action });
+    await this.promisedSetState({ level, action });
+  }
+
+  promisedSetState = (newState) => {
+    return new Promise((resolve) => {
+        this.setState(newState, () => {
+            resolve()
+        });
+    });
+  }
+
+  async final_action(location) {
+    await this.updateOutcomeIndex(this.state.outcome)
+    await this.updateLevelIndex(this.state.level)
+    this.props.okPressed({ location, action: this.state.action });
+    this.reset();
   }
 
   get_action(outcome, level, object_type) {
@@ -90,7 +107,7 @@ export default class RocketDialog extends Component {
 
   render() {
     const buttons = ["SCORED", "MISSED"];
-    const starting_level = ["LEVEL 0", "LEVEL 1", "LEVEL 2"];
+    const starting_level = ["LOW", "MID", "HIGH"];
     const { outcome, level, action } = this.state;
     const { object_type, location } = this.props;
     const name = object_type == constants.object_type.CARGO ? "CARGO" : "HATCH";
@@ -130,8 +147,7 @@ export default class RocketDialog extends Component {
                 text="OK"
                 bordered
                 onPress={() => {
-                  this.props.okPressed({ location, action });
-                  this.reset();
+                  this.final_action(location)
                 }}
                 textStyle={{ fontSize: 15, color: "#008ae6" }}
                 key="button-2"
@@ -146,6 +162,7 @@ export default class RocketDialog extends Component {
               selectedIndex={outcome}
               buttons={buttons}
               containerStyle={{ height: 50 }}
+              selectedButtonStyle={{backgroundColor: this.state.button_color}}
             />
             <Text>Select a level</Text>
             <ButtonGroup
