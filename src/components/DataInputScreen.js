@@ -812,7 +812,7 @@ class DataInputScreen extends Component {
               <TouchableOpacity
                 style={styles.pickup_button}
                 onPress={() =>
-                  this._pickupDialogPressed(constants.locations.LEFT_FEEDER)
+                  this._pickupDialogPressed(constants.locations.LEFT_FLOOR)
                 }
               >
                 <Text>FLOOR PICKUP</Text>

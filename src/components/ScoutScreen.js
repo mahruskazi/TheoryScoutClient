@@ -42,7 +42,7 @@ class ScoutScreen extends Component {
       this.state.match_number,
       alliance_color
     );
-    selected_team = teams[this.state.selectedIndex];
+    selected_team = teams.length == 0 ? this.state.selected_team : teams[this.state.selectedIndex];
     this.setState({
       toggled: !this.state.toggled,
       alliance_color,
@@ -65,6 +65,7 @@ class ScoutScreen extends Component {
   }
 
   team_selector() {
+    console.log(this.state.selected_team)
     teams = getTeamKeysForMatch(
       this.props.event.matches,
       parseInt(this.state.match_number),
@@ -113,6 +114,9 @@ class ScoutScreen extends Component {
       this.refs.toast.show("Enter a valid match number");
       return;
     }
+    console.log("TEAM NUMBER: " + this.state.selected_team)
+    console.log("TEAM NUMBER TYPE: " + (typeof this.state.selected_team))
+    console.log("TEAM NUMBER TYPE: " + (typeof parseInt(this.state.selected_team)))
     props = {
       match_number: this.state.match_number,
       team_number: this.state.selected_team,
