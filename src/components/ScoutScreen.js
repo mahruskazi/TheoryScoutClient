@@ -42,7 +42,7 @@ class ScoutScreen extends Component {
       this.state.match_number,
       alliance_color
     );
-    selected_team = teams[this.state.selectedIndex];
+    selected_team = teams.length == 0 ? this.state.selected_team : teams[this.state.selectedIndex];
     this.setState({
       toggled: !this.state.toggled,
       alliance_color,
@@ -65,6 +65,7 @@ class ScoutScreen extends Component {
   }
 
   team_selector() {
+    console.log(this.state.selected_team)
     teams = getTeamKeysForMatch(
       this.props.event.matches,
       parseInt(this.state.match_number),
@@ -125,6 +126,15 @@ class ScoutScreen extends Component {
 
   updateMatchNumber() {
     this.setState({match_number: parseInt(this.state.match_number) + 1})
+
+    teams = getTeamKeysForMatch(
+      this.props.event.matches,
+      parseInt(this.state.match_number) + 1,
+      this.state.alliance_color
+    );
+    selected_team = teams[this.state.selectedIndex];
+    console.log("BACK: " + selected_team)
+    this.setState({ selected_team });
   }
 
   render() {
