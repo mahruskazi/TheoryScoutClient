@@ -24,6 +24,10 @@ class DataInputScreen extends Component {
   constructor(props) {
     super(props);
     data = props.navigation.state.params;
+    console.log("MATCH: " + data.match_number)
+    console.log("TEAM: " + data.team_number)
+    console.log("COLOR: " + data.alliance_color)
+    console.log("NAME: " + data.scout_name)
     set =
       data.alliance_color == "red"
         ? this.props.settings.orientation
