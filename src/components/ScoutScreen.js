@@ -20,7 +20,11 @@ class ScoutScreen extends Component {
       match_number: 1,
       name: "",
       alliance_color: "red",
-      selected_team: null
+      selected_team: (selected_team = getTeamKeysForMatch(
+        this.props.event.matches,
+        0,
+        "red"
+      )[0])
     };
     this.updateIndex = this.updateIndex.bind(this);
   }
@@ -42,7 +46,10 @@ class ScoutScreen extends Component {
       this.state.match_number,
       alliance_color
     );
-    selected_team = teams.length == 0 ? this.state.selected_team : teams[this.state.selectedIndex];
+    selected_team =
+      teams.length == 0
+        ? this.state.selected_team
+        : teams[this.state.selectedIndex];
     this.setState({
       toggled: !this.state.toggled,
       alliance_color,
@@ -64,8 +71,18 @@ class ScoutScreen extends Component {
     this.setState({ selectedIndex, selected_team });
   }
 
+  onMatchChange(match_number) {
+    teams = getTeamKeysForMatch(
+      this.props.event.matches,
+      parseInt(match_number),
+      this.state.alliance_color
+    );
+    selected_team = teams[this.state.selectedIndex];
+    this.setState({ match_number, selected_team });
+  }
+
   team_selector() {
-    console.log(this.state.selected_team)
+    console.log("Current selected team: " + this.state.selected_team);
     teams = getTeamKeysForMatch(
       this.props.event.matches,
       parseInt(this.state.match_number),
@@ -119,22 +136,22 @@ class ScoutScreen extends Component {
       team_number: this.state.selected_team,
       alliance_color: this.state.alliance_color,
       scout_name: this.state.name,
-      onGoBack: () => this.updateMatchNumber()
+      onGoBack: () => this.incrementMatchNumber()
     };
+    console.log("SCOUTING: " + JSON.stringify(props));
     this.props.navigation.navigate("DataInput", props);
   };
 
-  updateMatchNumber() {
-    this.setState({match_number: parseInt(this.state.match_number) + 1})
+  incrementMatchNumber() {
+    new_match = parseInt(this.state.match_number) + 1;
 
     teams = getTeamKeysForMatch(
       this.props.event.matches,
-      parseInt(this.state.match_number) + 1,
+      new_match,
       this.state.alliance_color
     );
     selected_team = teams[this.state.selectedIndex];
-    console.log("BACK: " + selected_team)
-    this.setState({ selected_team });
+    this.setState({ selected_team, match_number: new_match });
   }
 
   render() {
@@ -142,7 +159,8 @@ class ScoutScreen extends Component {
       getQualificationMatches(this.props.event.matches).length == 0
         ? "Match number"
         : "Match number (1 - " +
-          getQualificationMatches(this.props.event.matches).length.toString() + ")";
+          getQualificationMatches(this.props.event.matches).length.toString() +
+          ")";
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -164,7 +182,7 @@ class ScoutScreen extends Component {
             keyboardType="number-pad"
             leftIconContainerStyle={{ marginRight: 5 }}
             leftIcon={{ type: "ionicon", name: "logo-game-controller-a" }}
-            onChangeText={match_number => this.setState({ match_number })}
+            onChangeText={match_number => this.onMatchChange(match_number)}
             value={this.state.match_number.toString()}
           />
 
@@ -212,7 +230,7 @@ class ScoutScreen extends Component {
 
 function mapStateToProps(state) {
   return {
-    event: state.events,
+    event: state.events
   };
 }
 
