@@ -77,7 +77,10 @@ class ScoutScreen extends Component {
       parseInt(match_number),
       this.state.alliance_color
     );
-    selected_team = teams[this.state.selectedIndex];
+    if (teams != undefined && teams.length > 0)
+      selected_team = teams[this.state.selectedIndex];
+    else
+      selected_team = this.state.selected_team;
     this.setState({ match_number, selected_team });
   }
 
@@ -127,13 +130,17 @@ class ScoutScreen extends Component {
       this.refs.toast.show("Please input a name");
       return;
     }
-    if (teams.length == 0 && this.props.event.matches.length != 0) {
+    if ((teams.length == 0 && this.props.event.matches.length != 0) || this.state.match_number.length == 0) {
       this.refs.toast.show("Enter a valid match number");
       return;
     }
+    selected_team = this.state.selected_team;
+    if (selected_team == undefined){
+      selected_team = teams[this.state.selectedIndex]
+    }
     props = {
       match_number: this.state.match_number,
-      team_number: this.state.selected_team,
+      team_number: selected_team,
       alliance_color: this.state.alliance_color,
       scout_name: this.state.name,
       onGoBack: () => this.incrementMatchNumber()
@@ -150,7 +157,11 @@ class ScoutScreen extends Component {
       new_match,
       this.state.alliance_color
     );
-    selected_team = teams[this.state.selectedIndex];
+
+    if (teams != undefined && teams.length > 0)
+      selected_team = teams[this.state.selectedIndex];
+    else
+      selected_team = this.state.selected_team;
     this.setState({ selected_team, match_number: new_match });
   }
 
